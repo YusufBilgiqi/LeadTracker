@@ -19,6 +19,7 @@ h1 {
 input {
   padding: 0.4rem 0.2rem;
   border: 1px solid #5f9341;
+  min-width: 400px;
 }
 button {
   background-color: #5f9341;
@@ -26,8 +27,16 @@ button {
   color: white;
   padding: 0.5rem 1.25rem;
 }
+button:hover {
+  cursor: pointer;
+}
 #delete-btn {
   background-color: red;
+}
+#tab-btn {
+  background-color: white;
+  color: green;
+  border: 1px solid black;
 }
 ul {
   list-style: none;
