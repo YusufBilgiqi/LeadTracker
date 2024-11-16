@@ -1,18 +1,36 @@
-let myLeads = [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  remove,
+} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL:
+    "https://leads-tracker-app-8f6b0-default-rtdb.europe-west1.firebasedatabase.app/",
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const referenceInDB = ref(database, "leads");
+
+onValue(referenceInDB, function (snapshot) {
+  const snapshotDoesExist = snapshot.exists();
+  if (snapshotDoesExist) {
+    const snapshotValues = snapshot.val();
+    const leads = Object.values(snapshotValues);
+    render(leads);
+  }
+});
+
 const inputEl = document.getElementById("input-el");
 const inputBtn = document.getElementById("input-btn");
 const ulEl = document.getElementById("ul-el");
 const deleteBtn = document.getElementById("delete-btn");
-const tabBtn = document.getElementById("tab-btn");
-
-const leadsFromLocalStorage = JSON.parse(localStorage.getItem("myLeads"));
 
 // Renders the leads from local storage
-
-if (leadsFromLocalStorage) {
-  myLeads = leadsFromLocalStorage;
-  render(myLeads);
-}
 
 function render(leads) {
   let listItems = "";
@@ -23,30 +41,16 @@ function render(leads) {
   ulEl.innerHTML = listItems;
 }
 
-tabBtn.addEventListener("click", function () {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    myLeads.push(tabs[0].url);
-    localStorage.setItem("myLeads", JSON.stringify(myLeads));
-    render(myLeads);
-  });
+deleteBtn.addEventListener("dblclick", function () {
+  remove(referenceInDB);
+  ulEl.innerHTML = "";
+  inputEl.value = "";
+  console.clear();
 });
 
 inputBtn.addEventListener("click", function () {
-  myLeads.push(inputEl.value);
+  push(referenceInDB, inputEl.value);
   inputEl.value = "";
-
-  localStorage.setItem("myLeads", JSON.stringify(myLeads));
-
-  render(myLeads);
-  console.log(localStorage.getItem("myLeads"));
-});
-
-deleteBtn.addEventListener("dblclick", function () {
-  ulEl.innerHTML = "";
-  myLeads = [];
-  inputEl.value = "";
-  localStorage.clear();
-  console.clear();
 });
 
 // localStorage.setItem("a"; "b") => a:key, b:value
